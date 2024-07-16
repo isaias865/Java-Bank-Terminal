@@ -13,7 +13,7 @@ public class SqliteCheckingDao implements CheckingDao {
 
     @Override
     public CheckingAccount createCheckingAccount(CheckingAccount newAccount) {
-        String sql = "insert into account values (?, ?, ?)";
+        String sql = "insert into account values (?, ?, ?, ?)";
         try(Connection connection = DatabaseConnector.createConnection()){
             // we can use a PreparedStatement to control how the user data is injected
             // into our query. the PreparedStatement helps to format the data so to help
@@ -22,8 +22,9 @@ public class SqliteCheckingDao implements CheckingDao {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             // remember that indexing for Java sql resources starts at 1, not 0
             preparedStatement.setString(1, newAccount.getOwner());
-            preparedStatement.setInt(2, newAccount.getSolaris());
-            preparedStatement.setInt(3, newAccount.getSpice());
+            preparedStatement.setString(2, newAccount.getName());
+            preparedStatement.setDouble(3, newAccount.getSolaris());
+            preparedStatement.setDouble(4, newAccount.getSpice());
             // executeUpdate returns the row count affected, since we want a single
             // record created we can check that the rowCount value is 1 to know if we
             // have success or not
@@ -40,8 +41,92 @@ public class SqliteCheckingDao implements CheckingDao {
     }
 
     @Override
-    public List<CheckingAccount> getAllCheckingAccounts(User user) {
-        String owner = user.getUsername();
+    public void deposit(CheckingAccount account, double amount){
+        String sql = "update account set solaris = ? where username = ? and accountName = ?";
+        try(Connection connection = DatabaseConnector.createConnection()){
+            // we can use a PreparedStatement to control how the user data is injected
+            // into our query. the PreparedStatement helps to format the data so to help
+            // protect us from SQL injection (someone trying to mess with our database
+            // via the data they provide)
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            // remember that indexing for Java sql resources starts at 1, not 0
+            preparedStatement.setDouble(1, amount + account.getSolaris());
+            preparedStatement.setString(2, account.getOwner());
+            preparedStatement.setString(3, account.getName());
+            // executeUpdate returns the row count affected, since we want a single
+            // record created we can check that the rowCount value is 1 to know if we
+            // have success or not
+            int result = preparedStatement.executeUpdate();
+            if (result == 1){
+                return;
+            }
+            // if we did not create the new user we throw a custom exception and handle
+            // the problem somewhere else
+            throw new UserSQLException("Solaris could not be deposited: please try again");
+        } catch (SQLException exception){
+            throw new UserSQLException(exception.getMessage());
+        }
+    }
+
+    @Override
+    public void spice(CheckingAccount account, double cost, double spice) {
+        String sql = "update account set solaris = ?, spice = ? where username = ? and accountName = ?";
+        try(Connection connection = DatabaseConnector.createConnection()){
+            // we can use a PreparedStatement to control how the user data is injected
+            // into our query. the PreparedStatement helps to format the data so to help
+            // protect us from SQL injection (someone trying to mess with our database
+            // via the data they provide)
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            // remember that indexing for Java sql resources starts at 1, not 0
+            preparedStatement.setDouble(1, account.getSolaris() - cost);
+            preparedStatement.setDouble(2, spice + account.getSpice());
+            preparedStatement.setString(3, account.getOwner());
+            preparedStatement.setString(4, account.getName());
+            // executeUpdate returns the row count affected, since we want a single
+            // record created we can check that the rowCount value is 1 to know if we
+            // have success or not
+            int result = preparedStatement.executeUpdate();
+            if (result == 1){
+                return;
+            }
+            // if we did not create the new user we throw a custom exception and handle
+            // the problem somewhere else
+            throw new UserSQLException("Spice could not be bought: please try again");
+        } catch (SQLException exception){
+            throw new UserSQLException(exception.getMessage());
+        }
+    }
+
+    @Override
+    public void delete(CheckingAccount account) {
+        String sql = "delete from account where username = ? and accountName = ?";
+        try(Connection connection = DatabaseConnector.createConnection()){
+            // we can use a PreparedStatement to control how the user data is injected
+            // into our query. the PreparedStatement helps to format the data so to help
+            // protect us from SQL injection (someone trying to mess with our database
+            // via the data they provide)
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            // remember that indexing for Java sql resources starts at 1, not 0
+            preparedStatement.setString(1, account.getOwner());
+            preparedStatement.setString(2, account.getName());
+            // executeUpdate returns the row count affected, since we want a single
+            // record created we can check that the rowCount value is 1 to know if we
+            // have success or not
+            int result = preparedStatement.executeUpdate();
+            if (result == 1){
+                return;
+            }
+            // if we did not create the new user we throw a custom exception and handle
+            // the problem somewhere else
+            throw new UserSQLException("Account could not be deleted: please try again");
+        } catch (SQLException exception){
+            throw new UserSQLException(exception.getMessage());
+        }
+    }
+
+    @Override
+    public List<CheckingAccount> getAllCheckingAccounts(String user) {
+        String owner = user;
         String sql = "select * from account where username ='" + owner + "'";
         try(Connection connection = DatabaseConnector.createConnection()){
             // we can use a Statement object to execute our query
@@ -55,8 +140,9 @@ public class SqliteCheckingDao implements CheckingDao {
                 CheckingAccount accountRecord = new CheckingAccount();
                 // you can use the column name or the column index to get the data (indexing starts at 1)
                 accountRecord.setOwner(resultSet.getString("username"));
-                accountRecord.setSolaris(resultSet.getInt("solaris"));
-                accountRecord.setSolaris(resultSet.getInt("spice"));
+                accountRecord.setName(resultSet.getString("accountName"));
+                accountRecord.setSolaris(resultSet.getDouble("solaris"));
+                accountRecord.setSpice(resultSet.getDouble("spice"));
 
                 checkingAccounts.add(accountRecord);
             }
@@ -68,4 +154,6 @@ public class SqliteCheckingDao implements CheckingDao {
             throw new UserSQLException(exception.getMessage());
         }
     }
+
+
 }

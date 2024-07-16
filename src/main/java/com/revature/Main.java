@@ -13,15 +13,6 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        /*
-            Registration Steps
-                - user needs to prompt they want to make an account
-                - user needs to provide a username and password
-                - system needs to check the username and password conform to software requirements
-                - system needs to save the credentials if they are valid, or reject them if they are not
-                - user needs to be informed of the results
-         */
-
         try(Scanner scanner = new Scanner(System.in)){
             // this userDao will handle accessing and persisting User data
             UserDao userDao = new SqliteUserDao();
@@ -44,14 +35,6 @@ public class Main {
                     while (Boolean.parseBoolean(controlMap.get("Continue Loop"))){
                         userController.showBankPortal(controlMap);
                     }
-
-                    /*
-                    System.out.printf("Banking stuff for %s can happen here! Press any key to continue", controlMap.get("User"));
-                    scanner.nextLine();
-                        NOTE: currently the User information has no means of being removed: when you implement a log out
-                        functionality the controlMap needs to have the User key/value pair removed:
-                        - controlMap.remove("User");
-                     */
                 }
             }
         }

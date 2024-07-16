@@ -56,7 +56,7 @@ public class UserService {
         }
         // 3.2 inform user of results
         // we can use an exception to return an error message if the credentials are not persisted
-        throw new RuntimeException("placeholder for custom exception");
+        throw new RuntimeException("Usernames must be unique and both usernames and passwords must not be longer than 30 characters");
     }
 
     public User checkLoginCredentials(User credentials){

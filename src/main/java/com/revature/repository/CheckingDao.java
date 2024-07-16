@@ -8,6 +8,8 @@ import java.util.List;
 public interface CheckingDao {
 
     CheckingAccount createCheckingAccount(CheckingAccount newAccount);
-    List<CheckingAccount> getAllCheckingAccounts(User user);
-
+    List<CheckingAccount> getAllCheckingAccounts(String user);
+    void deposit(CheckingAccount account, double amount);
+    void spice(CheckingAccount account, double cost, double spice);
+    void delete(CheckingAccount account);
 }

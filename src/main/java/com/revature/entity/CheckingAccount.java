@@ -5,30 +5,44 @@ import java.util.Objects;
 public class CheckingAccount {
 
     private String owner;
-    private int solaris;
-    private int spice;
+    private String name;
+    private double solaris;
+    private double spice;
 
     public  CheckingAccount(){}
 
-    public CheckingAccount(String owner, int solaris, int spice) {
+    public CheckingAccount(String owner, String name, double solaris, double spice) {
         this.owner = owner;
+        this.name = name;
         this.solaris = solaris;
         this.spice = spice;
     }
 
-    public int getSolaris() {
+    public CheckingAccount(String owner) {
+        this.owner = owner;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getSolaris() {
         return solaris;
     }
 
-    public void setSolaris(int solaris) {
+    public void setSolaris(double solaris) {
         this.solaris = solaris;
     }
 
-    public int getSpice() {
+    public double getSpice() {
         return spice;
     }
 
-    public void setSpice(int spice) {
+    public void setSpice(double spice) {
         this.spice = spice;
     }
 
@@ -45,20 +59,20 @@ public class CheckingAccount {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CheckingAccount that = (CheckingAccount) o;
-        return getSolaris() == that.getSolaris() && getSpice() == that.getSpice() && Objects.equals(getOwner(), that.getOwner());
+        return getSolaris() == that.getSolaris() && getSpice() == that.getSpice() && Objects.equals(getOwner(), that.getOwner()) && Objects.equals(getName(), that.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getOwner(), getSolaris(), getSpice());
+        return Objects.hash(getOwner(), getName(), getSolaris(), getSpice());
     }
 
     @Override
     public String toString() {
-        return "CheckingAccount{" +
-                "owner=" + owner +
-                ", solaris=" + solaris +
-                ", spice=" + spice +
-                "}\n";
+        return "Checking Account: " + name + "\n" +
+                "Owner: " + owner + "\n" +
+                "Solaris: " + solaris + "\n" +
+                "Spice: " + spice + "\n";
+
     }
 }

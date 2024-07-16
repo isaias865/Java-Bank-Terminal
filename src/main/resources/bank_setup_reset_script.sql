@@ -11,8 +11,9 @@ drop table if exists "account";
 
 create table "account"(
 	username text,
-	solaris int,
-	spice int
+	accountName text,
+	solaris real,
+	spice real
 );
 
-insert into "account" values ('admin', 100 ,100 );
+insert into "account" values ('admin','default',100,100);
